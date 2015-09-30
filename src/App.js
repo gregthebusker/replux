@@ -7,7 +7,7 @@ var App = React.createClass({
             <div>
                 App Test Page
                 <div>
-                    <ComponentBox>
+                    <ComponentBox colors={['red', 'blue']} className="box1">
                         <ComponentBox>
                             <ComponentBox/>
                             <ComponentBox/>
