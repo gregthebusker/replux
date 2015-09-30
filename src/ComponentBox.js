@@ -29,9 +29,11 @@ var ComponentBox = React.createClass({
                             border: '1px solid black',
                             display: 'flex',
                         }}>
-                        {this.props.colors.map(c => {
+                        {this.props.colors.map((c, i) => {
                             return (
                                 <div
+                                    className="color-box"
+                                    key={i}
                                     style={{
                                         backgroundColor: c,
                                         width: '100%',

@@ -52,7 +52,8 @@
         "es6": true,
         "commonjs": true,
         "browser": true,
-        "node": true
+        "node": true,
+        "jest": true,
     },
     "extends": "eslint:recommended",
     "ecmaFeatures": {

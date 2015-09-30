@@ -1,5 +1,5 @@
 var React = require('react');
-var ComponentBox = require('ComponentBox');
+var ComponentBox = require('./ComponentBox.js');
 
 var App = React.createClass({
     render() {
