@@ -25,6 +25,7 @@
   },
   "homepage": "https://github.com/gregthebusker/replux#readme",
   "dependencies": {
+    "babel": "^5.8.23",
     "babel-core": "^5.8.25",
     "babel-jest": "^5.3.0",
     "babel-loader": "^5.3.2",
@@ -43,7 +44,8 @@
   "jest": {
     "scriptPreprocessor": "./node_modules/babel-jest",
     "unmockedModulePathPatterns": [
-      "./node_modules/react"
+      "./node_modules/",
+      "./src"
     ]
   }
 }
