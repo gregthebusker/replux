@@ -12,6 +12,11 @@ var connector = (reducerObjects=[]) => {
         return React.createClass({
             contextTypes: contextTypes,
 
+            dispatch(reducer, action) {
+                var name = getReducerName(reducer);
+                this.context[name].dispatch(action);
+            },
+
             render() {
                 var props = {};
                 reducerObjects.map(obj => {
@@ -22,7 +27,7 @@ var connector = (reducerObjects=[]) => {
                     };
                 });
 
-                return <WrappedComponent {...this.props} {...props} />;
+                return <WrappedComponent {...this.props} {...props} dispatch={this.dispatch} />;
             },
         });
     };

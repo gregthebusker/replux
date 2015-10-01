@@ -16,7 +16,18 @@ describe('App Tests', () => {
             expect(boxes[0].style.backgroundColor).toEqual(color);
         };
 
+        var click = (className) => {
+            var component = TestUtils.findRenderedDOMComponentWithClass(
+                dom, className);
+            TestUtils.Simulate.click(component);
+        };
+
         getAndCheck('box1', 'red');
-        getAndCheck('readReducer1', 'green');
+        getAndCheck('readReducer1-1', 'green');
+        getAndCheck('readReducer1-2', 'green');
+
+        click('setReducer1-1');
+        getAndCheck('readReducer1-1', 'yellow');
+        getAndCheck('readReducer1-2', 'yellow');
     });
 });

@@ -3,6 +3,7 @@ var React = require('react');
 var ComponentBox = React.createClass({
     propTypes: {
         colors: React.PropTypes.array,
+        content: React.PropTypes.any,
     },
 
     getDefaultProps() {
@@ -12,6 +13,22 @@ var ComponentBox = React.createClass({
     },
 
     render() {
+        var content = this.props.content;
+        if (!content) {
+            content = this.props.colors.map((c, i) => {
+                return (
+                    <div
+                        className="color-box"
+                        key={i}
+                        style={{
+                            backgroundColor: c,
+                            width: '100%',
+                            height: '100%',
+                        }}
+                    />
+                );
+            });
+        }
         return (
             <div style={{
                 width: '100%',
@@ -29,19 +46,7 @@ var ComponentBox = React.createClass({
                             border: '1px solid black',
                             display: 'flex',
                         }}>
-                        {this.props.colors.map((c, i) => {
-                            return (
-                                <div
-                                    className="color-box"
-                                    key={i}
-                                    style={{
-                                        backgroundColor: c,
-                                        width: '100%',
-                                        height: '100%',
-                                    }}
-                                />
-                            );
-                        })}
+                        {content}
                     </div>
                 </div>
                 <div style={{

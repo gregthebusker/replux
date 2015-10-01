@@ -16,7 +16,7 @@ var Creator = (createStore=() => {}, baseReducers=[], inheritedReducers=[]) => {
 
         childContextTypes: contextTypes,
 
-        getChildContext: function() {
+        componentWillMount() {
             var childContext = {};
 
             inheritedReducers.map(r => {
@@ -33,7 +33,20 @@ var Creator = (createStore=() => {}, baseReducers=[], inheritedReducers=[]) => {
                 childContext[name] = createStore(r);
             });
 
-            return childContext;
+            for (var key in childContext) {
+                var store = childContext[key];
+                store.subscribe(this.subscribeToStore);
+            }
+
+            this.childContext = childContext;
+        },
+
+        getChildContext() {
+            return this.childContext;
+        },
+
+        subscribeToStore() {
+            this.forceUpdate();
         },
 
         render() {
