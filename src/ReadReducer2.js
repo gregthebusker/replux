@@ -1,10 +1,10 @@
 var React = require('react');
 var ComponentBox = require('./ComponentBox.js');
-var Reducer1 = require('./Reducer1.js');
+var Reducer2 = require('./Reducer2.js');
 var connector = require('./connector.js');
 
 
-var ReadReducer1 = React.createClass({
+var ReadReducer2 = React.createClass({
     propTypes: {
         color: React.PropTypes.string,
     },
@@ -19,10 +19,10 @@ var ReadReducer1 = React.createClass({
 });
 
 module.exports = connector([{
-    reducer: Reducer1.Reducer,
+    reducer: Reducer2.Reducer,
     mapToProps: (state) => {
         return {
             color: state.color,
         };
     }
-}])(ReadReducer1);
+}])(ReadReducer2);

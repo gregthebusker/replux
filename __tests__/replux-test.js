@@ -22,12 +22,35 @@ describe('App Tests', () => {
             TestUtils.Simulate.click(component);
         };
 
-        getAndCheck('box1', 'red');
         getAndCheck('readReducer1-1', 'green');
         getAndCheck('readReducer1-2', 'green');
+        getAndCheck('readReducer1-3', 'green');
+
+        click('setReducer1-2');
+        getAndCheck('readReducer1-1', 'green');
+        getAndCheck('readReducer1-2', 'green');
+        getAndCheck('readReducer1-3', 'yellow');
 
         click('setReducer1-1');
         getAndCheck('readReducer1-1', 'yellow');
         getAndCheck('readReducer1-2', 'yellow');
+        getAndCheck('readReducer1-3', 'yellow');
+
+
+        getAndCheck('readReducer2-1', 'red');
+        getAndCheck('readReducer2-2', 'red');
+        getAndCheck('readReducer2-3', 'red');
+
+        click('setReducer2-1');
+        getAndCheck('readReducer2-1', 'blue');
+        getAndCheck('readReducer2-2', 'blue');
+        getAndCheck('readReducer2-3', 'red');
+
+        click('setReducer2-2');
+        getAndCheck('readReducer2-1', 'blue');
+        getAndCheck('readReducer2-2', 'blue');
+        getAndCheck('readReducer2-3', 'pink');
+
+
     });
 });

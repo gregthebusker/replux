@@ -14,7 +14,7 @@ var Actions = {
 };
 
 var defaultState = {
-    color: 'yellow',
+    color: 'red',
 };
 
 var Reducer = reduce(defaultState, (state={}, action) => {
