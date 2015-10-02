@@ -41,7 +41,7 @@ var App = React.createClass({
                                     <Creator createStore={createStore} baseReducers={[Reducer2.Reducer]}>
                                         <ComponentBox content="New Instance Reducer 2">
                                             <ReadReducer2 className="readReducer2-3" />
-                                            <SetReducer2 className="setReducer2-2" color="pink" />
+                                            <SetReducer2 className="setReducer2-2" color="teal" />
                                         </ComponentBox>
                                     </Creator>
                                 </ComponentBox>

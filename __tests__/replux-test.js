@@ -1,8 +1,9 @@
 describe('App Tests', () => {
     it('Renders colors correctly in root', () => {
         var App = require('../src/App.js');
-        var React = require('react/addons');
-        var TestUtils = React.addons.TestUtils;
+        var React = require('react');
+        var ReactDOM = require('react-dom');
+        var TestUtils = require('react-addons-test-utils');
 
         var dom = TestUtils.renderIntoDocument(
           <App />
@@ -11,7 +12,7 @@ describe('App Tests', () => {
         var getAndCheck = (className, color) => {
             var component = TestUtils.findRenderedDOMComponentWithClass(
                 dom, className);
-            var box = React.findDOMNode(component);
+            var box = ReactDOM.findDOMNode(component);
             var boxes = box.querySelectorAll('.color-box');
             expect(boxes[0].style.backgroundColor).toEqual(color);
         };
@@ -49,7 +50,7 @@ describe('App Tests', () => {
         click('setReducer2-2');
         getAndCheck('readReducer2-1', 'blue');
         getAndCheck('readReducer2-2', 'blue');
-        getAndCheck('readReducer2-3', 'pink');
+        getAndCheck('readReducer2-3', 'teal');
 
 
     });

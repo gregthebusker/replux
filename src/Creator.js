@@ -62,12 +62,16 @@ var Container = React.createClass({
         inheritedReducers: React.PropTypes.array,
     },
 
-    render() {
-        var CreatorClass = Creator(
+    componentWillMount() {
+        this.CreatorClass = Creator(
             this.props.createStore,
             this.props.baseReducers,
             this.props.inheritedReducers
         );
+    },
+
+    render() {
+        var CreatorClass = this.CreatorClass;
         return (
             <CreatorClass>
                 {this.props.children}
