@@ -26,15 +26,18 @@ describe('App Tests', () => {
         getAndCheck('readReducer1-1', 'green');
         getAndCheck('readReducer1-2', 'green');
         getAndCheck('readReducer1-3', 'green');
+        getAndCheck('readWithGetState1-1', 'green');
 
         click('setReducer1-2');
         getAndCheck('readReducer1-1', 'green');
         getAndCheck('readReducer1-2', 'green');
+        getAndCheck('readWithGetState1-1', 'green');
         getAndCheck('readReducer1-3', 'yellow');
 
         click('setReducer1-1');
         getAndCheck('readReducer1-1', 'yellow');
         getAndCheck('readReducer1-2', 'yellow');
+        getAndCheck('readWithGetState1-1', 'yellow');
         getAndCheck('readReducer1-3', 'yellow');
 
 

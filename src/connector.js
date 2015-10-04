@@ -17,9 +17,18 @@ var connector = (reducerObjects=[]) => {
                 this.context[name].dispatch(action);
             },
 
+            getState(reducer) {
+                var name = getReducerName(reducer);
+                return this.context[name].getState();
+            },
+
             render() {
                 var props = {};
                 reducerObjects.map(obj => {
+                    if (!obj.mapToProps) {
+                        return;
+                    }
+
                     var name = getReducerName(obj.reducer);
                     props = {
                         ...props,
@@ -27,7 +36,14 @@ var connector = (reducerObjects=[]) => {
                     };
                 });
 
-                return <WrappedComponent {...this.props} {...props} dispatch={this.dispatch} />;
+                return (
+                    <WrappedComponent
+                        {...this.props}
+                        {...props}
+                        dispatch={this.dispatch}
+                        getState={this.getState}
+                    />
+                );
             },
         });
     };

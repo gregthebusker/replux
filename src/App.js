@@ -9,6 +9,7 @@ var Creator = require('./Creator.js');
 var Reducer1 = require('./Reducer1.js');
 var Reducer2 = require('./Reducer2.js');
 var { createStore } = require('redux');
+var ReadWithGetState = require('./ReadWithGetState.js');
 
 var App = React.createClass({
     render() {
@@ -20,7 +21,7 @@ var App = React.createClass({
                         <ReadReducer1 className="readReducer1-1">
                             <SetReducer1 className="setReducer1-1" color="yellow">
                                 <ReadReducer1 className="readReducer1-2" />
-                                <ComponentBox/>
+                                <ReadWithGetState className="readWithGetState1-1"  />
                             </SetReducer1>
                             <Creator createStore={createStore} baseReducers={[Reducer1.Reducer]}>
                                 <ComponentBox content="New Instance of Base Reducer1">
