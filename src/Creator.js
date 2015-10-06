@@ -1,13 +1,11 @@
 var React = require('react');
 var { getReducerName } = require('./InternalUtils.js');
 
-var Creator = (createStore=() => {}, baseReducers=[], inheritedReducers=[]) => {
-
-    var allReducers = [...baseReducers, ...inheritedReducers];
+var Creator = (createStore=() => {}, reducers=[]) => {
 
     var contextTypes = {};
-    allReducers.map(r => {
-        var name = getReducerName(r);
+    reducers.map(r => {
+        var name = getReducerName(r.reducer);
         contextTypes[name] = React.PropTypes.object;
     });
 
@@ -19,18 +17,13 @@ var Creator = (createStore=() => {}, baseReducers=[], inheritedReducers=[]) => {
         componentWillMount() {
             var childContext = {};
 
-            inheritedReducers.map(r => {
-                var name = getReducerName(r);
+            reducers.map(r => {
+                var name = getReducerName(r.reducer);
                 var contextReducer = this.context[name];
-                if (!contextReducer) {
-                    contextReducer = createStore(r);
+                if (!r.inherit || !contextReducer) {
+                    contextReducer = createStore(r.reducer, r.baseState);
                 }
                 childContext[name] = contextReducer;
-            });
-
-            baseReducers.map(r => {
-                var name = getReducerName(r);
-                childContext[name] = createStore(r);
             });
 
             for (var key in childContext) {
@@ -57,16 +50,14 @@ var Creator = (createStore=() => {}, baseReducers=[], inheritedReducers=[]) => {
 
 var Container = React.createClass({
     propTypes: {
-        baseReducers: React.PropTypes.array,
         createStore: React.PropTypes.func.isRequired,
-        inheritedReducers: React.PropTypes.array,
+        reducers: React.PropTypes.array,
     },
 
     componentWillMount() {
         this.CreatorClass = Creator(
             this.props.createStore,
-            this.props.baseReducers,
-            this.props.inheritedReducers
+            this.props.reducers
         );
     },
 

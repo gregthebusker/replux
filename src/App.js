@@ -14,7 +14,9 @@ var ReadWithGetState = require('./ReadWithGetState.js');
 var App = React.createClass({
     render() {
         return (
-            <Creator createStore={createStore} baseReducers={[Reducer1.Reducer]}>
+            <Creator createStore={createStore} reducers={[{
+                reducer: Reducer1.Reducer,
+            }]}>
                 <div>
                     App Test Page
                     <div>
@@ -23,28 +25,46 @@ var App = React.createClass({
                                 <ReadReducer1 className="readReducer1-2" />
                                 <ReadWithGetState className="readWithGetState1-1"  />
                             </SetReducer1>
-                            <Creator createStore={createStore} baseReducers={[Reducer1.Reducer]}>
+                            <Creator createStore={createStore} reducers={[{
+                                reducer: Reducer1.Reducer,
+                            }]}>
                                 <ComponentBox content="New Instance of Base Reducer1">
                                     <SetReducer1 className="setReducer1-2" color="yellow">
                                         <ReadReducer1 className="readReducer1-3" />
                                     </SetReducer1>
                                 </ComponentBox>
                             </Creator>
-                            <Creator createStore={createStore} inheritedReducers={[Reducer2.Reducer]}>
+                            <Creator createStore={createStore} reducers={[{
+                                reducer: Reducer2.Reducer,
+                                inherit: true,
+                            }]}>
                                 <ComponentBox content="Inherit Reducer 2">
                                     <ReadReducer2 className="readReducer2-1" />
-                                    <Creator createStore={createStore} inheritedReducers={[Reducer2.Reducer]}>
+                                    <Creator createStore={createStore} reducers={[{
+                                        reducer: Reducer2.Reducer,
+                                        inherit: true,
+                                    }]}>
                                         <ComponentBox content="Inherit Reducer 2">
                                             <ReadReducer2 className="readReducer2-2" />
                                             <SetReducer2 className="setReducer2-1" color="blue" />
                                         </ComponentBox>
                                     </Creator>
-                                    <Creator createStore={createStore} baseReducers={[Reducer2.Reducer]}>
+                                    <Creator createStore={createStore} reducers={[{
+                                        reducer: Reducer2.Reducer,
+                                    }]}>
                                         <ComponentBox content="New Instance Reducer 2">
                                             <ReadReducer2 className="readReducer2-3" />
                                             <SetReducer2 className="setReducer2-2" color="teal" />
                                         </ComponentBox>
                                     </Creator>
+                                </ComponentBox>
+                            </Creator>
+                            <Creator createStore={createStore} reducers={[{
+                                reducer: Reducer1.Reducer,
+                                baseState: { color: 'purple' },
+                            }]}>
+                                <ComponentBox content="New Instance of Reducer 1 with default state of purple">
+                                    <ReadReducer1 className="readReducer1-4" />
                                 </ComponentBox>
                             </Creator>
                         </ReadReducer1>

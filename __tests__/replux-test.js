@@ -28,6 +28,8 @@ describe('App Tests', () => {
         getAndCheck('readReducer1-3', 'green');
         getAndCheck('readWithGetState1-1', 'green');
 
+        getAndCheck('readReducer1-4', 'purple');
+
         click('setReducer1-2');
         getAndCheck('readReducer1-1', 'green');
         getAndCheck('readReducer1-2', 'green');
