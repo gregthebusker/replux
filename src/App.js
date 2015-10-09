@@ -35,6 +35,17 @@ var App = React.createClass({
                                 </ComponentBox>
                             </Creator>
                             <Creator createStore={createStore} reducers={[{
+                                reducer: Reducer1.Reducer,
+                            }]}>
+                                {() =>
+                                    <ComponentBox content="New Instance of Base Reducer1 with React 0.13 syntax">
+                                        <SetReducer1 className="setReducer1-5" color="yellow">
+                                            <ReadReducer1 className="readReducer1-5" />
+                                        </SetReducer1>
+                                    </ComponentBox>
+                                }
+                            </Creator>
+                            <Creator createStore={createStore} reducers={[{
                                 reducer: Reducer2.Reducer,
                                 inherit: true,
                             }]}>
@@ -65,6 +76,16 @@ var App = React.createClass({
                             }]}>
                                 <ComponentBox content="New Instance of Reducer 1 with default state of purple">
                                     <ReadReducer1 className="readReducer1-4" />
+                                </ComponentBox>
+                            </Creator>
+                            <Creator createStore={createStore} reducers={[{
+                                reducer: Reducer1.Reducer,
+                            }, {
+                                reducer: Reducer2.Reducer,
+                            }]}>
+                                <ComponentBox content="New Instance of Reducer1 and Reducer2">
+                                    <ReadReducer1 className="readReducer1-6" />
+                                    <ReadReducer2 className="readReducer2-6" />
                                 </ComponentBox>
                             </Creator>
                         </ReadReducer1>

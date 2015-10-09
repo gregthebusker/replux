@@ -43,7 +43,11 @@ var Creator = (createStore=() => {}, reducers=[]) => {
         },
 
         render() {
-            return React.Children.only(this.props.children);
+            if (typeof this.props.children == 'function') {
+                return this.props.children();
+            } else {
+                return React.Children.only(this.props.children);
+            }
         },
     });
 };

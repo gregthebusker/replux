@@ -26,7 +26,11 @@ describe('App Tests', () => {
         getAndCheck('readReducer1-1', 'green');
         getAndCheck('readReducer1-2', 'green');
         getAndCheck('readReducer1-3', 'green');
+        getAndCheck('readReducer1-5', 'green');
         getAndCheck('readWithGetState1-1', 'green');
+
+        getAndCheck('readReducer1-6', 'green');
+        getAndCheck('readReducer2-6', 'red');
 
         getAndCheck('readReducer1-4', 'purple');
 
@@ -35,12 +39,21 @@ describe('App Tests', () => {
         getAndCheck('readReducer1-2', 'green');
         getAndCheck('readWithGetState1-1', 'green');
         getAndCheck('readReducer1-3', 'yellow');
+        getAndCheck('readReducer1-5', 'green');
+
+        click('setReducer1-5');
+        getAndCheck('readReducer1-1', 'green');
+        getAndCheck('readReducer1-2', 'green');
+        getAndCheck('readWithGetState1-1', 'green');
+        getAndCheck('readReducer1-3', 'yellow');
+        getAndCheck('readReducer1-5', 'yellow');
 
         click('setReducer1-1');
         getAndCheck('readReducer1-1', 'yellow');
         getAndCheck('readReducer1-2', 'yellow');
         getAndCheck('readWithGetState1-1', 'yellow');
         getAndCheck('readReducer1-3', 'yellow');
+        getAndCheck('readReducer1-5', 'yellow');
 
 
         getAndCheck('readReducer2-1', 'red');
