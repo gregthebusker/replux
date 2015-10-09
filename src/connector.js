@@ -32,7 +32,7 @@ var connector = (reducerObjects=[]) => {
                     var name = getReducerName(obj.reducer);
                     props = {
                         ...props,
-                        ...obj.mapToProps(this.context[name].getState()),
+                        ...obj.mapToProps(this.context[name].getState(), this.props),
                     };
                 });
 
