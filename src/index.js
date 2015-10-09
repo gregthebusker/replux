@@ -1,5 +1,9 @@
-var React = require('react');
-var App = require('./App');
-var ReactDOM = require('react-dom');
+var Utilities = require('./Utilities.js');
+var Creator = require('./Creator.js');
+var connector = require('./connector.js');
 
-ReactDOM.render(<App />, document.getElementById('root'));
+module.exports = {
+    ...Utilities,
+    Creator,
+    connector,
+};
