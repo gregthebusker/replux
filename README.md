@@ -66,17 +66,172 @@ module.exports = connect((state, props) => {
 
 As you can see our example is starting to get a bit complicated.  And our easily reusable Paginator component isn't that reusable anymore.  If we want to add another table to our application we have to update our top level reducer and create a new wrapper for our Paginator component that connects it properly.  We haven't even talked about the work to update the Table component that encompasses our Paginator component.  As our application expands and more tables are part of our application we quickly loose the simplicity and maintainability we attempt to gain with a flux architecture.
 
-
 ## Why Redux
 
+So the first thing we want to do to clean up our table example is to move where we create our reducer store.  Instead of combining reducer at the root of our application, lets do it at our component level.  In our example we we could have our Table component create the reducer.
+
+```js
+var Table = React.createClass({
+    render() {
+        var store = createStore(reducer);
+        return (
+            <Provider store={store}>
+                // Our table components.
+            </Provider>
+        )
+    },
+})
+```
+
+This solves some of the issues.  Our Paginator component can now dispatch the same even no matter where its used and it will update the correct store.  But it also restricts all the components that are descendants of Table to only have access to the reducers that table set up.  The is mostly fine until we want to read from a reducer that was instantiated in an ancestor of our Table component.  We can copy it into the Table store, but that only generates a copy that can only be mutated locally, because our dispatch calls are also scoped only to this new store.  The solution to this is what replux is all about.
+
+Instead of combining reducers into one store replux structors reducers into their own individual stores.  By doing this we can instantiate reducer at the component level or the root level, and have component inherit reducers when needed.  Lets see how this works with with replux.
+
+
+Replux introduces a Creator component similar to the Provider component in react-redux.  The creator component will instantiate a redux store for each reducer.  In addition you can specify which components should be inherited from its ancestor components.  If the component was not be instantiated yet, it will do it here.  Here's an example of how we might use it.
+
+```js
+var React = require('react');
+var { Creator } = require('replux');
+var Table = React.createClass({
+    render() {
+        var store = createStore(reducer);
+        return (
+            <Creator createStore={createStore} reducers={[{
+                // An example of a reducer that should be
+                // instantiated with this component.
+                reducer: PaginatorReducer,
+            }, {
+                // An example of a reducer that might be instantiated
+                // at the root of your application.
+                // We declare it here as a dependency and only
+                // instantiate it if it hasn't been created already.
+                reducer: UserReducer,
+                inherit: true,
+            }]}>
+                // Our table components
+            </Creator>
+        )
+    },
+})
+```
+
+Replux also introduces a connector function with models off of the connnect function from react-redux.  The connector works very similar to connect.  Instead of having one mapToProps function you need to specify one for each reducer.  Your reducer's state will be transferred as props to your component just like with react-redux.  `this.props.dispatch` and `this.props.getState` has a small change where you must pass the reducer function as the first argument.  Here's an example.
+
+
+```js
+var React = require('react');
+var PaginatorReducer = require('PaginatorReducer');
+var { connector } = require('replux');
+
+var Paginator = React.createClass({
+    render() {
+        /**
+         * getState example
+         * var state = this.props.getState(PaginatorReducer);
+         *
+         * dispatch example
+         * this.props.dispatch(PaginatorReducer, someReduxAction);
+         */
+        return (
+            <div>
+                Page {this.props.page}
+            </div>
+        );
+    },
+});
+
+module.exports = connector([{
+    reducer: PaginatorReducer,
+    mapToProps: (state) => {
+        return {
+            // Notice because this state if bound to the reducer
+            // function, we no longer need to worry about what key it
+            // was bound to in combine reducers.
+            page: state.page,
+        };
+    }
+}])(Paginator);
+```
 
 
 ## Main API
 
 ### Creator
-### connector
+
+#### props
+##### reducers: Array({ reducer, baseState, inherit})
+- reducer : function
+A redux reducer function.
+- baseState : any
+The base state of the reducer.  Will be passed into createStore.
+- inherit : bool
+True if this reducer should inherit a previous instantiated reducer
+
+##### createStore: function(reducer, baseState)
+This should the same createStore function from redux.
+
+### connector: function(Array({ reducer, mapToProps }))(ReactComponent)
+connector expects an array of object.  Each object should have the following
+- reducer : function
+A redux reducer function.
+- mapToProps : function(state, props) returns object
+A function that returns an object.
+
+#### this.props.dispatch: function(reducer, action)
+Works the same as this.props.dispatch from react-redux except it require the reducer function used to instantiate the reducer.
+
+#### this.props.getState: function(reducer)
+Works the same as getState from redux except it require the reducer function used to instantiate the reducer.  Notice its also passed in as props.  If you need access to it in your redux actions you should pass it into the function call.
 
 ## Utility API
 
-### uniquify
-### reduce
+Replux also includes some extra utility functions to ease development.
+
+### reduce : function(defaultState, function) returns function
+
+reduce will merge your default state into the given state.  This function is useful when you pass in a base state to `createStore`.  Normally using rest parameters any field you don't specify would be undefined, which might not be what you want.  With `reduce` it will gracefully merge in your default state so only you need to only specify the properties you want to change.
+
+
+```js
+var { reduce } = require('replux');
+
+var defaultState = {
+    example: '',
+    private_example: '',
+};
+
+var Reducer = reduce(defaultState, (state={}, action) => {
+    switch (action.type) {
+        // Reducer code.
+    }
+});
+```
+
+### uniquify : function(object) return object
+
+uniquify takes a map and gives each key a unique string.  This makes it easier to name your action types.  If you choose not to use `Creator` and `connector` you can still use this function to make sure all actions have unique types when you call `combineReducers` in redux.
+
+```js
+var { reduce, uniquify } = require('replux');
+
+var Types = uniquify({
+    EXAMPLE: '', // No need to worry about what to call this action.
+});
+
+var defaultState = {
+    example: '',
+};
+
+var Reducer = reduce(defaultState, (state={}, action) => {
+    switch (action.type) {
+        case Types.EXAMPLE:
+            return {
+                ...state,
+                example: action.example,
+            };
+        default:
+            return state;
+    }
+});
+```
