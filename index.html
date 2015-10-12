@@ -22,7 +22,356 @@
       <h1>
 <a id="replux" class="anchor" href="#replux" aria-hidden="true"><span class="octicon octicon-link"></span></a>replux</h1>
 
-<p>Enhancements for Redux to use with greater self contained components</p>
+<p><a href="https://travis-ci.org/gregthebusker/replux"><img src="https://travis-ci.org/gregthebusker/replux.svg" alt="Build Status"></a>
+<a href="https://david-dm.org/gregthebusker/replux"><img src="https://david-dm.org/gregthebusker/replux.svg" alt="Dependency Status"></a>
+<a href="https://david-dm.org/gregthebusker/replux#info=devDependencies"><img src="https://david-dm.org/gregthebusker/replux/dev-status.svg" alt="devDependency Status"></a></p>
+
+<blockquote>
+<p>Self contained components and enhancements for <a href="https://github.com/rackt/redux">Redux</a></p>
+</blockquote>
+
+<ul>
+<li><a href="#background-and-why-redux">Background</a></li>
+<li><a href="#the-problem">The Problem</a></li>
+<li><a href="#why-redux">Why Redux</a></li>
+<li><a href="#api">Api</a></li>
+<li><a href="#creator">Creator</a></li>
+<li><a href="#connector">connector</a></li>
+<li><a href="#utilities">Utilities</a></li>
+</ul>
+
+<h2>
+<a id="background-and-why-redux" class="anchor" href="#background-and-why-redux" aria-hidden="true"><span class="octicon octicon-link"></span></a>Background and why Redux</h2>
+
+<p>As a project grows there's increased need for a library to handle its application architecture.  In React the main design pattern to accomplish this is <a href="https://facebook.github.io/flux/">Flux</a>(check it out for a more detailed explanation).  Facebook has a library build around this design pattern, but its pretty minimal.  Personally I think it doesn't provide the utility needed to build a react application quickly, clean, and maintainable.  Luckily there are many other libraries that do a much better job.  I spent some time looking over the many libraries available, and landed on <a href="https://github.com/rackt/redux">Redux</a> as the best library to solve my needs.  Recommend you check out the redux website and read through their documentation.</p>
+
+<h2>
+<a id="the-problem" class="anchor" href="#the-problem" aria-hidden="true"><span class="octicon octicon-link"></span></a>The Problem</h2>
+
+<p>Redux does a great job at building a clean interface of connecting components to a store in react.  But from my experience redux has some struggles in code reusability and portability.  Let's take an example I deal with often in my work; Tables.  Tables have a lot of different properties to them.  Here's a couple of examples of properties you might want to set in your store for your application state.</p>
+
+<ul>
+<li>Sorting: Which column is sorted, is it ascending or descending.</li>
+<li>Pagination: What page of data the user is on</li>
+<li>Selection: Rows of the table that are selected</li>
+<li>Columns: Which columns to show</li>
+<li>Etc..</li>
+</ul>
+
+<p>Redux works really well for this example.  You could have a different reducer for each of these examples.  One reducer that stores the pagination details, one that store the sorting details, and so on.  The problem with Redux comes when you want to start having multiple tables on a page, or maybe there's a table in a pop up.  For most cases each of your tables should operate independently of one another.  If you sort one table, it shouldn't necessarily change the sorting of the other.</p>
+
+<p>Let's look at how you might solve one aspect of this example with redux: Pagination.  Imagine we've built a pagination component.  It uses <code>redux.connect</code> to connect it to our redux store and can fire actions that update the page we're on.  The tricky part comes when we have multiple tables(and thus multiple paginators).  The first thing we need to do is generate multiple reducers and combine them at the top level of our component.</p>
+
+<div class="highlight highlight-source-js"><pre><span class="pl-k">var</span> { combineReducers } <span class="pl-k">=</span> <span class="pl-c1">require</span>(<span class="pl-s"><span class="pl-pds">'</span>redux<span class="pl-pds">'</span></span>);
+
+<span class="pl-k">var</span> <span class="pl-en">genReducer</span> <span class="pl-k">=</span> (<span class="pl-smi">reducer</span>)<span class="pl-k"> =&gt;</span> {
+    <span class="pl-c">// Custom code to create a reducer with unique actions and</span>
+    <span class="pl-c">// types so it can be reusable.</span>
+};
+
+<span class="pl-k">var</span> reducer <span class="pl-k">=</span> combineReducers({
+    Reducer1<span class="pl-k">:</span> genReducer(PaginationReducer1),
+    Reducer2<span class="pl-k">:</span> genReducer(PaginationReducer2)
+});</pre></div>
+
+<p>In addition we'll need to make sure our pagination component is connected to the right reducer and is able to dispatch the correct events to update the correct reducer.  We can write a helper function to make this more reusable too.</p>
+
+<div class="highlight highlight-source-js"><pre><span class="pl-c">// Paginator for our first table.</span>
+<span class="pl-k">var</span> Paginator <span class="pl-k">=</span> <span class="pl-c1">require</span>(<span class="pl-s"><span class="pl-pds">'</span>Paginator<span class="pl-pds">'</span></span>);
+<span class="pl-k">var</span> { connect } <span class="pl-k">=</span> <span class="pl-c1">require</span>(<span class="pl-s"><span class="pl-pds">'</span>redux<span class="pl-pds">'</span></span>);
+
+<span class="pl-k">var</span> getPaginatorProps <span class="pl-k">=</span> (state) {
+    <span class="pl-k">return</span> {
+        page<span class="pl-k">:</span> state.page,
+        somethingElse<span class="pl-k">:</span> state.somethingElse,
+    };
+};
+
+<span class="pl-c1">module</span>.exports <span class="pl-k">=</span> connect((<span class="pl-smi">state</span>, <span class="pl-smi">props</span>)<span class="pl-k"> =&gt;</span> {
+    <span class="pl-k">return</span> {
+        ...getPaginatorProps(state),
+        <span class="pl-c">// You'll also need to make sure this component has access to</span>
+        <span class="pl-c">// the right bound actions to dispatch.  I'm not going to show</span>
+        <span class="pl-c">// you the details on how to do that because I think it makes</span>
+        <span class="pl-c">// the example even more complicated.</span>
+        actions<span class="pl-k">:</span> boundActionsForReducer1,
+    };
+})(Paginator);</pre></div>
+
+<p>As you can see our example is starting to get a bit complicated.  And our easily reusable Paginator component isn't that reusable anymore.  If we want to add another table to our application we have to update our top level reducer and create a new wrapper for our Paginator component that connects it properly.  And there is more work that we'll need to do to update the Table component that encompasses our Paginator component.  As our application expands and more tables are part of our application we quickly loose the simplicity and maintainability we attempt to gain with a flux architecture.</p>
+
+<h2>
+<a id="why-redux" class="anchor" href="#why-redux" aria-hidden="true"><span class="octicon octicon-link"></span></a>Why Redux</h2>
+
+<p>So the first thing we want to do to clean up our table example, is to change where we instantiate our reducer store.  Instead of combining reducer at the root of our application, lets do it at our component level.  In our example we we could have our Table component create the reducer.</p>
+
+<div class="highlight highlight-source-js"><pre><span class="pl-k">var</span> Table <span class="pl-k">=</span> React.createClass({
+    <span class="pl-en">render</span>() {
+        <span class="pl-k">var</span> store <span class="pl-k">=</span> createStore(reducer);
+        <span class="pl-k">return</span> (
+            <span class="pl-k">&lt;</span>Provider store<span class="pl-k">=</span>{store}<span class="pl-k">&gt;</span>
+                <span class="pl-c">// Our table components.</span>
+            <span class="pl-k">&lt;/</span>Provider<span class="pl-k">&gt;</span>
+        )
+    },
+})</pre></div>
+
+<p>This solves some of the issues.  Our Paginator component can now dispatch the same even no matter where its used and it will update the correct store.  But it also restricts all the components that are descendants of Table to only have access to the reducers that we instantiated at this level.  This is mostly fine until we want to read from a reducer that was instantiated in an ancestor of our Table component.  We can copy it into the Table store, but that only generates a copy that can only be mutated locally, because our dispatch calls are scoped only to this new store.  This is where replux comes in.</p>
+
+<p>Instead of combining reducers into one store replux structors reducers into their own individual stores.  By doing this we can instantiate reducer at the component level or the root level, and have component inherit reducers when needed.  Lets see how this works with replux.</p>
+
+<p>Replux introduces a <code>Creator</code> component similar to the <code>Provider</code> component in react-redux.  The <code>Creator</code> component will instantiate a redux store for each reducer.  In addition you can specify which components should be inherited from its ancestor components.  If the component was not be instantiated yet, it will do it here.  Here's an example of how we might use it.</p>
+
+<div class="highlight highlight-source-js"><pre><span class="pl-k">var</span> React <span class="pl-k">=</span> <span class="pl-c1">require</span>(<span class="pl-s"><span class="pl-pds">'</span>react<span class="pl-pds">'</span></span>);
+<span class="pl-k">var</span> { Creator } <span class="pl-k">=</span> <span class="pl-c1">require</span>(<span class="pl-s"><span class="pl-pds">'</span>replux<span class="pl-pds">'</span></span>);
+<span class="pl-k">var</span> Table <span class="pl-k">=</span> React.createClass({
+    <span class="pl-en">render</span>() {
+        <span class="pl-k">var</span> store <span class="pl-k">=</span> createStore(reducer);
+        <span class="pl-k">return</span> (
+            <span class="pl-k">&lt;</span>Creator createStore<span class="pl-k">=</span>{createStore} reducers<span class="pl-k">=</span>{[{
+                <span class="pl-c">// An example of a reducer that should be</span>
+                <span class="pl-c">// instantiated with this component.</span>
+                reducer<span class="pl-k">:</span> PaginatorReducer,
+            }, {
+                <span class="pl-c">// An example of a reducer that might be instantiated</span>
+                <span class="pl-c">// at the root of your application.</span>
+                <span class="pl-c">// We declare it here as a dependency and only</span>
+                <span class="pl-c">// instantiate it if it hasn't been created already.</span>
+                reducer<span class="pl-k">:</span> UserReducer,
+                inherit<span class="pl-k">:</span> <span class="pl-c1">true</span>,
+            }]}<span class="pl-k">&gt;</span>
+                <span class="pl-c">// Our table components</span>
+            <span class="pl-k">&lt;/</span>Creator<span class="pl-k">&gt;</span>
+        )
+    },
+})</pre></div>
+
+<p>Replux also introduces a <code>connector</code> function with models off of the <code>connect</code> function from react-redux.  The <code>connector</code> works very similar to connect.  Instead of having one mapToProps function you need to specify one for each reducer.  Your reducer's state will be transferred as props to your component just like with react-redux.  <code>this.props.dispatch</code> and <code>this.props.getState</code> have a small change where you must pass the reducer function as the first argument.  Here's an example.</p>
+
+<div class="highlight highlight-source-js"><pre><span class="pl-k">var</span> React <span class="pl-k">=</span> <span class="pl-c1">require</span>(<span class="pl-s"><span class="pl-pds">'</span>react<span class="pl-pds">'</span></span>);
+<span class="pl-k">var</span> PaginatorReducer <span class="pl-k">=</span> <span class="pl-c1">require</span>(<span class="pl-s"><span class="pl-pds">'</span>PaginatorReducer<span class="pl-pds">'</span></span>);
+<span class="pl-k">var</span> { connector } <span class="pl-k">=</span> <span class="pl-c1">require</span>(<span class="pl-s"><span class="pl-pds">'</span>replux<span class="pl-pds">'</span></span>);
+
+<span class="pl-k">var</span> Paginator <span class="pl-k">=</span> React.createClass({
+    <span class="pl-en">onClick</span>() {
+        <span class="pl-v">this</span>.props.dispatch(
+            PaginatorReducer, PaginatorActions.setPage(<span class="pl-v">this</span>.props.page <span class="pl-k">+</span> <span class="pl-c1">1</span>)
+        );
+    },
+
+    <span class="pl-en">render</span>() {
+        <span class="pl-c">/**</span>
+<span class="pl-c">         * getState example</span>
+<span class="pl-c">         * I recommend you don't use getState in your react</span>
+<span class="pl-c">         * component.  Instead get access to the state with the</span>
+<span class="pl-c">         * connector function and pass values in as props.</span>
+<span class="pl-c">         *</span>
+<span class="pl-c">         * getState should be passed to your reducer actions when one</span>
+<span class="pl-c">         * reducer depends on another.</span>
+<span class="pl-c">         * var state = this.props.getState(PaginatorReducer);</span>
+<span class="pl-c">         */</span>
+        <span class="pl-k">return</span> (
+            <span class="pl-k">&lt;</span>div<span class="pl-k">&gt;</span>
+                Page {<span class="pl-v">this</span>.props.page}
+                <span class="pl-k">&lt;</span>button onClick<span class="pl-k">=</span>{<span class="pl-v">this</span>.onClick}<span class="pl-k">&gt;</span>Next Page<span class="pl-k">&lt;/</span>button<span class="pl-k">&gt;</span>
+            <span class="pl-k">&lt;/</span>div<span class="pl-k">&gt;</span>
+        );
+    },
+});
+
+<span class="pl-c1">module</span>.exports <span class="pl-k">=</span> connector([{
+    reducer<span class="pl-k">:</span> PaginatorReducer,
+    mapToProps<span class="pl-k">:</span> (<span class="pl-smi">state</span>)<span class="pl-k"> =&gt;</span> {
+        <span class="pl-k">return</span> {
+            <span class="pl-c">// Notice because this state if bound to the reducer</span>
+            <span class="pl-c">// function, we no longer need to worry about what key it</span>
+            <span class="pl-c">// was bound to in combine reducers.</span>
+            page<span class="pl-k">:</span> state.page,
+        };
+    }
+}])(Paginator);</pre></div>
+
+<p>Because each reducer is now its own store, <code>getState</code> from redux doesn't provide the utility of getting data from other stores.  Replux has a get function for this purpose.  The <code>getState</code> function is passed to your react component by <code>connector</code> and as stated earlier requires you to pass in the reducer to get the state of that reducer.  Even though it is passed in as props I recommend you don't use <code>getState</code> in your react component.  Instead pass in the state as props with <code>connector</code>. You should pass <code>getState</code> to your reducer actions when one reducer depends on another.</p>
+
+<div class="highlight highlight-source-js"><pre>
+<span class="pl-c">// Table actions</span>
+
+<span class="pl-c">// Notice this example uses the thunk plugin from redux-thunk.</span>
+<span class="pl-k">var</span> <span class="pl-en">fetchData</span> <span class="pl-k">=</span> (<span class="pl-smi">getState</span>)<span class="pl-k"> =&gt;</span> {
+        <span class="pl-k">return</span> (<span class="pl-smi">dispatch</span>, <span class="pl-smi">getState</span>)<span class="pl-k"> =&gt;</span> {
+            <span class="pl-k">var</span> page <span class="pl-k">=</span> getState(PaginatorReducer).page;
+            <span class="pl-c">// Notice this is the redux dispatch function and not the replux dispatch.</span>
+            dispatch({
+                type<span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">'</span>fetching<span class="pl-pds">'</span></span>,
+            });
+            <span class="pl-c">// Fetch our data.</span>
+        };
+    },
+},
+
+
+
+<span class="pl-c">// Table component</span>
+<span class="pl-k">var</span> Table <span class="pl-k">=</span> React.createClass({
+    <span class="pl-en">componentWillReceiveProps</span>(<span class="pl-smi">nextProps</span>) {
+        <span class="pl-k">if</span> (nextProps.page <span class="pl-k">!=</span> <span class="pl-v">this</span>.props.page) {
+            <span class="pl-v">this</span>.fetchData();
+        }
+    },
+
+    <span class="pl-en">fetchData</span>() {
+        <span class="pl-c">// You could pass also pass this.props.page to fetchData.</span>
+        <span class="pl-c">// I'm passing this.props.getState just to show you how it might work.</span>
+        <span class="pl-v">this</span>.props.dispatch(
+            TableReducer,
+            TableActions.fetchData(<span class="pl-v">this</span>.props.getState)
+        );
+    },
+
+    <span class="pl-en">render</span>() {
+        <span class="pl-c">// Render details</span>
+    },
+});
+
+<span class="pl-c1">module</span>.exports <span class="pl-k">=</span> connector([{
+    reducer<span class="pl-k">:</span> TableReducer,
+    mapToProps<span class="pl-k">:</span> (<span class="pl-smi">state</span>)<span class="pl-k"> =&gt;</span> {
+        <span class="pl-k">return</span> {
+            data<span class="pl-k">:</span> state.<span class="pl-c1">data</span>,
+        };
+    },
+}, {
+    reducer<span class="pl-k">:</span> PaginatorReducer,
+    mapToProps<span class="pl-k">:</span> (<span class="pl-smi">state</span>)<span class="pl-k"> =&gt;</span> {
+        <span class="pl-k">return</span> {
+            page<span class="pl-k">:</span> state.page,
+        };
+    }
+}])(Table);</pre></div>
+
+<h2>
+<a id="api" class="anchor" href="#api" aria-hidden="true"><span class="octicon octicon-link"></span></a>API</h2>
+
+<h3>
+<a id="creator" class="anchor" href="#creator" aria-hidden="true"><span class="octicon octicon-link"></span></a><code>Creator</code>
+</h3>
+
+<h4>
+<a id="props" class="anchor" href="#props" aria-hidden="true"><span class="octicon octicon-link"></span></a><code>props</code>
+</h4>
+
+<h5>
+<a id="reducers-array-reducer-basestate-inherit" class="anchor" href="#reducers-array-reducer-basestate-inherit" aria-hidden="true"><span class="octicon octicon-link"></span></a><code>reducers: Array({ reducer, baseState, inherit})</code>
+</h5>
+
+<ul>
+<li>reducer : function
+A redux reducer function.</li>
+<li>baseState : any
+The base state of the reducer.  Will be passed into <code>createStore</code>.</li>
+<li>inherit : bool
+True if this reducer should inherit a previous instantiated reducer</li>
+</ul>
+
+<h5>
+<a id="createstore-functionreducer-basestate" class="anchor" href="#createstore-functionreducer-basestate" aria-hidden="true"><span class="octicon octicon-link"></span></a><code>createStore: function(reducer, baseState)</code>
+</h5>
+
+<p>This should the same <code>createStore</code> function from redux.</p>
+
+<h3>
+<a id="connector" class="anchor" href="#connector" aria-hidden="true"><span class="octicon octicon-link"></span></a><code>connector</code>
+</h3>
+
+<h4>
+<a id="functionarray-reducer-maptoprops-reactcomponent" class="anchor" href="#functionarray-reducer-maptoprops-reactcomponent" aria-hidden="true"><span class="octicon octicon-link"></span></a><code>function(Array({ reducer, mapToProps }))(ReactComponent)</code>
+</h4>
+
+<p>connector expects an array of object.  Each object should have the following</p>
+
+<ul>
+<li>reducer : function
+A redux reducer function.</li>
+<li>mapToProps : function(state, props) returns object
+A function that returns an object to be send as props.</li>
+</ul>
+
+<h4>
+<a id="thispropsdispatch-functionreducer-action" class="anchor" href="#thispropsdispatch-functionreducer-action" aria-hidden="true"><span class="octicon octicon-link"></span></a><code>this.props.dispatch: function(reducer, action)</code>
+</h4>
+
+<p>Works the same as this.props.dispatch from react-redux except it require the reducer function used to instantiate the reducer.</p>
+
+<h4>
+<a id="thispropsgetstate-functionreducer" class="anchor" href="#thispropsgetstate-functionreducer" aria-hidden="true"><span class="octicon octicon-link"></span></a><code>this.props.getState: function(reducer)</code>
+</h4>
+
+<p>Works the same as <code>getState</code> from redux except it require the reducer function used to instantiate the reducer.  Notice it is passed in as props.  If you need access to it in your redux actions you should pass it into the function call.</p>
+
+<h2>
+<a id="utilities" class="anchor" href="#utilities" aria-hidden="true"><span class="octicon octicon-link"></span></a>Utilities</h2>
+
+<p>Replux also includes some extra utility functions to ease development.</p>
+
+<h3>
+<a id="reduce--functiondefaultstate-reducer-function-returns-function" class="anchor" href="#reduce--functiondefaultstate-reducer-function-returns-function" aria-hidden="true"><span class="octicon octicon-link"></span></a><code>reduce : function(defaultState, reducer function) returns function</code>
+</h3>
+
+<p>reduce will merge your default state into the given state.  This function is useful when you pass in a base state to <code>createStore</code>.  Normally using rest parameters any field you don't specify would be undefined, which might not be what you want.  With <code>reduce</code> it will gracefully merge in your default state so you need to only specify the properties you want to set.</p>
+
+<div class="highlight highlight-source-js"><pre><span class="pl-k">var</span> { reduce } <span class="pl-k">=</span> <span class="pl-c1">require</span>(<span class="pl-s"><span class="pl-pds">'</span>replux<span class="pl-pds">'</span></span>);
+
+<span class="pl-k">var</span> defaultState <span class="pl-k">=</span> {
+    example<span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">'</span><span class="pl-pds">'</span></span>,
+    private_example<span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">'</span>some-string<span class="pl-pds">'</span></span>,
+};
+
+<span class="pl-k">var</span> Reducer <span class="pl-k">=</span> reduce(defaultState, (<span class="pl-smi">state</span><span class="pl-k">=</span>{}, <span class="pl-smi">action</span>)<span class="pl-k"> =&gt;</span> {
+    <span class="pl-k">switch</span> (action.<span class="pl-c1">type</span>) {
+        <span class="pl-c">// Reducer code.</span>
+    }
+});
+
+
+<span class="pl-k">var</span> store <span class="pl-k">=</span> createStore(Reducer, {
+    example<span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">'</span>example<span class="pl-pds">'</span></span>
+});
+
+<span class="pl-c">// Without reduce</span>
+<span class="pl-en">console</span>.<span class="pl-c1">log</span>(store.getState().private_example) <span class="pl-c">// undefined</span>
+
+<span class="pl-c">// With reduce</span>
+<span class="pl-en">console</span>.<span class="pl-c1">log</span>(store.getState().private_example) <span class="pl-c">// 'some-string'</span>
+
+</pre></div>
+
+<h3>
+<a id="uniquify--functionobject-map-return-object" class="anchor" href="#uniquify--functionobject-map-return-object" aria-hidden="true"><span class="octicon octicon-link"></span></a><code>uniquify : function(Object Map) return object</code>
+</h3>
+
+<p>uniquify takes a map and gives each key a unique string value.  This makes it easier to name your action types.  If you choose not to use <code>Creator</code> and <code>connector</code> you can still use this function to make sure all actions have unique types when you call <code>combineReducers</code> in redux.</p>
+
+<div class="highlight highlight-source-js"><pre><span class="pl-k">var</span> { reduce, uniquify } <span class="pl-k">=</span> <span class="pl-c1">require</span>(<span class="pl-s"><span class="pl-pds">'</span>replux<span class="pl-pds">'</span></span>);
+
+<span class="pl-k">var</span> Types <span class="pl-k">=</span> uniquify({
+    EXAMPLE<span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">'</span><span class="pl-pds">'</span></span>, <span class="pl-c">// No need to worry about what to call this action.</span>
+});
+
+<span class="pl-k">var</span> defaultState <span class="pl-k">=</span> {
+    example<span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">'</span><span class="pl-pds">'</span></span>,
+};
+
+<span class="pl-k">var</span> Reducer <span class="pl-k">=</span> reduce(defaultState, (<span class="pl-smi">state</span><span class="pl-k">=</span>{}, <span class="pl-smi">action</span>)<span class="pl-k"> =&gt;</span> {
+    <span class="pl-k">switch</span> (action.<span class="pl-c1">type</span>) {
+        <span class="pl-k">case</span> Types.EXAMPLE<span class="pl-k">:</span>
+            <span class="pl-k">return</span> {
+                ...state,
+                example<span class="pl-k">:</span> action.example,
+            };
+        <span class="pl-k">default</span><span class="pl-k">:</span>
+            <span class="pl-k">return</span> state;
+    }
+});</pre></div>
 
       <footer class="site-footer">
         <span class="site-footer-owner"><a href="https://github.com/gregthebusker/replux">Replux</a> is maintained by <a href="https://github.com/gregthebusker">gregthebusker</a>.</span>
