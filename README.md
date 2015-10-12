@@ -6,13 +6,13 @@
 
 > Self contained components and enhancements for [Redux](https://github.com/rackt/redux)
 
-* [Background](##Background and why Redux)
-* [The Problem](#The Problem)
-* [Why Redux](#Why Redux)
-* [Api](#Api)
-- [Creator](#Creator)
+* [Background](#background-and-why-redux)
+* [The Problem](#the-problem)
+* [Why Redux](#why-redux)
+* [Api](#api)
+- [Creator](#creator)
 - [connector](#connector)
-* [Utilities](#Utilities)
+* [Utilities](#utilities)
 
 
 ## Background and why Redux
@@ -251,7 +251,8 @@ True if this reducer should inherit a previous instantiated reducer
 ##### `createStore: function(reducer, baseState)`
 This should the same `createStore` function from redux.
 
-### `connector: function(Array({ reducer, mapToProps }))(ReactComponent)`
+### `connector`
+#### `function(Array({ reducer, mapToProps }))(ReactComponent)`
 connector expects an array of object.  Each object should have the following
 - reducer : function
 A redux reducer function.
