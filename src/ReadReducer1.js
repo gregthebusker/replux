@@ -9,6 +9,12 @@ var ReadReducer1 = React.createClass({
         color: React.PropTypes.string,
     },
 
+    statics: {
+        testStatic() {
+            return 'test';
+        },
+    },
+
     render() {
         return (
             <ComponentBox colors={[this.props.color]} className={this.props.className}>

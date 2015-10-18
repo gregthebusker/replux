@@ -1,5 +1,6 @@
 var React = require('react');
 var { getReducerName } = require('./InternalUtils.js');
+var hoistStatics = require('hoist-non-react-statics');
 
 var connector = (reducerObjects=[]) => {
     var contextTypes = {};
@@ -9,7 +10,7 @@ var connector = (reducerObjects=[]) => {
     });
 
     return function wrapWithConnector(WrappedComponent) {
-        return React.createClass({
+        var Container = React.createClass({
             contextTypes: contextTypes,
 
             dispatch(reducer, action) {
@@ -46,6 +47,8 @@ var connector = (reducerObjects=[]) => {
                 );
             },
         });
+
+        return hoistStatics(Container, WrappedComponent);
     };
 };
 

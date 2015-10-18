@@ -72,4 +72,9 @@ describe('App Tests', () => {
 
 
     });
+
+    it('Hoists Statics Properly', () => {
+        var ReadReducer1 = require('../src/ReadReducer1.js');
+        expect(ReadReducer1.testStatic()).toEqual('test');
+    });
 });
