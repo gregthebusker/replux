@@ -42,6 +42,7 @@ var connector = (reducerObjects=[]) => {
                         {...this.props}
                         {...props}
                         dispatch={this.dispatch}
+                        repluxDispatch={this.dispatch}
                         getState={this.getState}
                     />
                 );

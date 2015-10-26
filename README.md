@@ -262,6 +262,9 @@ A function that returns an object to be send as props.
 #### `this.props.dispatch: function(reducer, action)`
 Works the same as this.props.dispatch from react-redux except it require the reducer function used to instantiate the reducer.
 
+#### `this.props.reduxDispatch: function(reducer, action)`
+Same as `dispatch` just named different to allow you to use both `react-redux` and `replux` in the same component.  Your component should be wrapped with `connect` from `react-redux` first before wrapping with `connector`.
+
 #### `this.props.getState: function(reducer)`
 Works the same as `getState` from redux except it require the reducer function used to instantiate the reducer.  Notice it is passed in as props.  If you need access to it in your redux actions you should pass it into the function call.
 
