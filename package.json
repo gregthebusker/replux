@@ -1,6 +1,6 @@
 {
   "name": "replux",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Enhancements for Redux to use with greater self contained components",
   "main": "./lib/index.js",
   "scripts": {
