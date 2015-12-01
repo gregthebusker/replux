@@ -1,4 +1,4 @@
-require('babel/polyfill');
+require('babel-polyfill');
 var React = require('react');
 var ComponentBox = require('./ComponentBox.js');
 var ReadReducer1 = require('./ReadReducer1.js');
