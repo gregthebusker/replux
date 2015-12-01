@@ -41,7 +41,7 @@
     "eslint-plugin-react": "^3.5.1",
     "gulp": "^3.9.0",
     "gulp-eslint": "^1.0.0",
-    "jest-cli": "^0.5.10",
+    "jest-cli": "^0.8.0",
     "jest-webpack": "^0.2.1",
     "react": "^0.14.0",
     "react-addons-test-utils": "^0.14.0",
