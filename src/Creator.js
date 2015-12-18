@@ -26,20 +26,11 @@ var Creator = (createStore=() => {}, reducers=[]) => {
                 childContext[name] = contextReducer;
             });
 
-            for (var key in childContext) {
-                var store = childContext[key];
-                store.subscribe(this.subscribeToStore);
-            }
-
             this.childContext = childContext;
         },
 
         getChildContext() {
             return this.childContext;
-        },
-
-        subscribeToStore() {
-            this.forceUpdate();
         },
 
         render() {

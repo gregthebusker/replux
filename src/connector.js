@@ -23,17 +23,34 @@ var connector = (reducerObjects=[]) => {
                 return this.context[name].getState();
             },
 
+            componentDidMount() {
+                this.unsubscribes = [];
+                reducerObjects.map(obj => {
+                    var name = getReducerName(obj.reducer);
+                    this.unsubscribes.push(this.context[name].subscribe(this.subscribeToStore));
+                });
+            },
+
+            componentWillUnmount() {
+                this.unsubscribes.map(un => un());
+            },
+
+            subscribeToStore() {
+                this.forceUpdate();
+            },
+
             render() {
                 var props = {};
                 reducerObjects.map(obj => {
-                    if (!obj.mapToProps) {
-                        return;
+                    var mappedProps = {};
+                    if (obj.mapToProps) {
+                        var name = getReducerName(obj.reducer);
+                        mappedProps = obj.mapToProps(this.context[name].getState(), this.props);
                     }
 
-                    var name = getReducerName(obj.reducer);
                     props = {
                         ...props,
-                        ...obj.mapToProps(this.context[name].getState(), this.props),
+                        ...mappedProps,
                     };
                 });
 
