@@ -4,7 +4,7 @@ var eslint = require('gulp-eslint');
 gulp.task('default', ['webpack']);
 
 gulp.task('lint', () => {
-    return gulp.src([`.//**/*.js`])
+    return gulp.src([`./src/**/*.js`])
         .pipe(eslint())
         .pipe(eslint.format());
 });
