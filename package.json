@@ -38,7 +38,7 @@
     "babel-preset-react": "^6.5.0",
     "babel-preset-stage-0": "^6.5.0",
     "eslint": "^2.7.0",
-    "eslint-plugin-react": "^4.3.0",
+    "eslint-plugin-react": "^5.1.1",
     "gulp": "^3.9.1",
     "gulp-eslint": "^2.0.0",
     "jest-cli": "^0.6.1",
